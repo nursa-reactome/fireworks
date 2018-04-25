@@ -47,9 +47,13 @@ public class EnrichmentLegend extends LegendPanel implements AnalysisPerformedHa
         //Setting the legend style
         addStyleName(RESOURCES.getCSS().enrichmentLegend());
 
-        this.add(this.gradient, 10, 25);
-        this.add(this.flag, 0, 20);
-        addLabels();
+        top = new InlineLabel("0");
+        bottom = new InlineLabel("0.05");
+
+        this.add(top, 0, 5);
+        this.add(gradient, 10, 25);
+        this.add(flag, 0, 20);
+        this.add(bottom, 0, 230);
 
         initHandlers();
 
@@ -150,7 +154,6 @@ public class EnrichmentLegend extends LegendPanel implements AnalysisPerformedHa
         top.setText("0");
         bottom.setText("0.05");
         this.setVisible(false);
-        if (COVERAGE) this.eventBus.fireEventFromSource(new OverlayTypeChangedEvent(COVERAGE = false), this);
     }
 
     private void fillGradient() {
@@ -175,17 +178,12 @@ public class EnrichmentLegend extends LegendPanel implements AnalysisPerformedHa
         ctx.clearRect(0, 0, this.flag.getOffsetWidth(), this.flag.getOffsetHeight());
 
         if (this.hovered != null) {
-            Integer y = COVERAGE ? 5 : null;
+            Integer y = null;
             EntityStatistics statistics = this.hovered.getStatistics();
             if (statistics != null) {
-                if (COVERAGE) {
-                    double percentage = statistics.getFound() / (double) statistics.getTotal();
-                    y = (int) Math.round(percentage * 200) + 5;
-                } else {
-                    double pValue = statistics.getpValue();
-                    if (pValue <= 0.05) {
-                        y = (int) Math.round(200 * pValue / 0.05) + 5;
-                    }
+                double pValue = statistics.getpValue();
+                if (pValue <= 0.05) {
+                    y = (int) Math.round(200 * pValue / 0.05) + 5;
                 }
             }
 
@@ -212,17 +210,12 @@ public class EnrichmentLegend extends LegendPanel implements AnalysisPerformedHa
         }
 
         if (this.selected != null) {
-            Integer y = COVERAGE ? 5 : null;
+            Integer y = null;
             EntityStatistics statistics = this.selected.getStatistics();
             if (statistics != null) {
-                if (COVERAGE) {
-                    double percentage = statistics.getFound() / (double) statistics.getTotal();
-                    y = (int) Math.round(percentage * 200) + 5;
-                } else {
-                    double pValue = statistics.getpValue();
-                    if (pValue <= 0.05) {
-                        y = (int) Math.round(200 * pValue / 0.05) + 5;
-                    }
+                double pValue = statistics.getpValue();
+                if (pValue <= 0.05) {
+                    y = (int) Math.round(200 * pValue / 0.05) + 5;
                 }
             }
 
