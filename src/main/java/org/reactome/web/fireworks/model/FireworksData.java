@@ -64,6 +64,9 @@ public class FireworksData {
         }
         for (PathwayBase pathway : result.getPathways()) {
             Node node = id2Node.get(pathway.getDbId());
+            if(node == null) {
+                node = stId2Node.get(pathway.getStId());
+            }
             if(node!=null){
                 node.setAnalysisResultData(result, pathway.getEntities());
             }
