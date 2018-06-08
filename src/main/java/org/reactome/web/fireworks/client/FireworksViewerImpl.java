@@ -45,7 +45,7 @@ import java.util.Set;
 /**
  * @author Antonio Fabregat <fabregat@ebi.ac.uk>
  */
-class FireworksViewerImpl extends ResizeComposite implements FireworksViewer,
+public class FireworksViewerImpl extends ResizeComposite implements FireworksViewer,
         MouseDownHandler, MouseMoveHandler, MouseUpHandler, MouseOutHandler, MouseWheelHandler,
         TouchStartHandler, TouchEndHandler, TouchMoveHandler, TouchCancelHandler,
         FireworksVisibleAreaChangedHandler, FireworksZoomHandler, ClickHandler, /*DoubleClickHandler,*/
@@ -57,19 +57,19 @@ class FireworksViewerImpl extends ResizeComposite implements FireworksViewer,
         GraphEntryHoveredHandler, GraphEntrySelectedHandler,
         NodeFlaggedResetHandler {
 
-    private EventBus eventBus;
+    protected EventBus eventBus;
 
     private FireworksViewerManager manager;
 
     private FireworksCanvas canvases;
 
-    private FireworksData data;
+    protected FireworksData data;
 
     private String token;
 
     private String resource;
 
-    private boolean forceFireworksDraw = true;
+    protected boolean forceFireworksDraw = true;
 
     // mouse positions relative to canvas (not the model)
     // Do not assign the same value at the beginning
@@ -85,7 +85,7 @@ class FireworksViewerImpl extends ResizeComposite implements FireworksViewer,
     private Set<Node> nodesToFlag = null;
     private Set<Edge> edgesToFlag = null;
 
-    FireworksViewerImpl(String json) {
+    protected FireworksViewerImpl(String json) {
         this.eventBus = new FireworksEventBus();
         try {
             Graph graph = ModelFactory.getGraph(json);
@@ -550,13 +550,14 @@ class FireworksViewerImpl extends ResizeComposite implements FireworksViewer,
 
         this.canvases.onAnalysisReset();
         this.data.resetPathwaysAnalysisResult();
+        filterResultBySpecies(token, resource);
+    }
+
+    protected void filterResultBySpecies(String token, final String resource) {
         AnalysisClient.filterResultBySpecies(token, resource, this.data.getSpeciesId(), new AnalysisHandler.Pathways() {
             @Override
             public void onPathwaysSpeciesFiltered(SpeciesFilteredResult result) {
-                result.setAnalysisType(AnalysisType.getType(result.getType()));
-                data.setPathwaysAnalysisResult(result); //Data has to be set in the first instance
-                eventBus.fireEventFromSource(new AnalysisPerformedEvent(result), FireworksViewerImpl.this);
-                forceFireworksDraw = true;
+                setPathwayAnalysisResult(result);
             }
 
             @Override
@@ -591,6 +592,13 @@ class FireworksViewerImpl extends ResizeComposite implements FireworksViewer,
     @Override
     public void resetFlaggedItems() {
         this.setFlaggedElements(null, null, null);
+    }
+    
+    public void setPathwayAnalysisResult(SpeciesFilteredResult result) {
+        result.setAnalysisType(AnalysisType.getType(result.getType()));
+        data.setPathwaysAnalysisResult(result); //Data has to be set in the first instance
+        eventBus.fireEventFromSource(new AnalysisPerformedEvent(result), this);
+        forceFireworksDraw = true;
     }
 
     private void doUpdate(){
