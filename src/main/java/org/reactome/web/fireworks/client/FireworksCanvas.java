@@ -9,6 +9,7 @@ import com.google.gwt.event.shared.HasHandlers;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RequiresResize;
 import org.reactome.web.fireworks.controls.navigation.NavigationControlPanel;
 import org.reactome.web.fireworks.controls.settings.HideableContainerPanel;
@@ -35,12 +36,12 @@ import java.util.Set;
 /**
  * @author Antonio Fabregat <fabregat@ebi.ac.uk>
  */
-class FireworksCanvas extends AbsolutePanel implements HasHandlers, RequiresResize,
+public class FireworksCanvas extends AbsolutePanel implements HasHandlers, RequiresResize,
         FireworksVisibleAreaChangedHandler, FireworksZoomHandler,
         NodeSelectedHandler, NodeSelectedResetHandler, NodeHoverHandler, NodeHoverResetHandler,
         AnalysisPerformedHandler, AnalysisResetHandler {
 
-    class CanvasNotSupportedException extends Exception {
+    public class CanvasNotSupportedException extends Exception {
     }
 
     static final double INITIAL_FONT = 7;
@@ -84,7 +85,7 @@ class FireworksCanvas extends AbsolutePanel implements HasHandlers, RequiresResi
 
     private Set<Node> drawnNodes = new HashSet<>();
 
-    FireworksCanvas(EventBus eventBus, Graph graph) throws CanvasNotSupportedException {
+    protected FireworksCanvas(EventBus eventBus, Graph graph) throws CanvasNotSupportedException {
         this.getElement().setClassName("pwp-FireworksCanvas");
         this.eventBus = eventBus;
         this.thumbnail = new FireworksThumbnail(eventBus, graph);
@@ -131,7 +132,7 @@ class FireworksCanvas extends AbsolutePanel implements HasHandlers, RequiresResi
         bottomContainerPanel.add(new FlaggedItemsControl(eventBus));
 
         //Enrichment legend and control panels
-        rightContainerPanel.add(new EnrichmentLegend(eventBus));
+        rightContainerPanel.add(createLegendPanel(eventBus));
         bottomContainerPanel.add(new EnrichmentControl(eventBus));
 
         //Expression legend and control panels
@@ -143,13 +144,21 @@ class FireworksCanvas extends AbsolutePanel implements HasHandlers, RequiresResi
         this.add(new RightTopLauncherPanel(eventBus));
 
         //Settings panel
-        rightContainerPanel.add(new HideableContainerPanel(eventBus));
+        rightContainerPanel.add(createHideablePanel(eventBus));
 
 
         //Illustration panel
         this.add(this.illustration = new IllustrationPanel(), 0, 0);
 
         this.initialiseHandlers();
+    }
+
+    protected Panel createHideablePanel(EventBus eventBus) {
+        return new HideableContainerPanel(eventBus);
+    }
+
+    protected Panel createLegendPanel(EventBus eventBus) {
+        return new EnrichmentLegend(eventBus);
     }
 
     private void initialiseHandlers() {
