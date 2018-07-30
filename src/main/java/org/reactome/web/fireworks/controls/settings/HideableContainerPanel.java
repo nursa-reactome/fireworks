@@ -24,7 +24,7 @@ import java.util.List;
 public class HideableContainerPanel extends FlowPanel implements ClickHandler {
     private boolean isExpanded = false;
     private List<Button> btns = new LinkedList<>();
-    private Button profilesBtn;
+    protected Button profilesBtn;
     private Button interactorsBtn;
     private Button aboutBtn;
     private PwpButton showBtn;
