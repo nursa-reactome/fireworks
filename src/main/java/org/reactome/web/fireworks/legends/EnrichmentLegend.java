@@ -6,6 +6,11 @@ import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.ui.InlineLabel;
+import com.google.gwt.user.client.ui.Label;
+
+import java.util.Arrays;
+import java.util.List;
+
 import org.reactome.web.analysis.client.model.EntityStatistics;
 import org.reactome.web.fireworks.events.*;
 import org.reactome.web.fireworks.handlers.*;
@@ -19,8 +24,9 @@ import org.reactome.web.fireworks.profiles.FireworksProfile;
 public class EnrichmentLegend extends LegendPanel implements AnalysisPerformedHandler, AnalysisResetHandler,
         NodeHoverHandler, NodeHoverResetHandler, NodeSelectedHandler, NodeSelectedResetHandler,
         ProfileChangedHandler {
-
-    private Canvas gradient;
+    
+    protected Canvas gradient;
+    protected List<Label> gradientLabels;
     private Canvas flag;
     private Node hovered;
     private Node selected;
@@ -35,14 +41,21 @@ public class EnrichmentLegend extends LegendPanel implements AnalysisPerformedHa
         //Setting the legend style
         addStyleName(RESOURCES.getCSS().enrichmentLegend());
 
-        this.add(new InlineLabel("0"), 20, 5);
         this.add(this.gradient, 10, 25);
         this.add(this.flag, 0, 20);
-        this.add(new InlineLabel("0.05"), 12, 230);
+        addLabels();
 
         initHandlers();
 
         this.setVisible(false);
+    }
+
+    protected void addLabels() {
+        InlineLabel top = new InlineLabel("0");
+        this.add(top, 20, 5);
+        InlineLabel bottom = new InlineLabel("0.05");
+        this.add(bottom, 12, 230);
+        this.gradientLabels = Arrays.asList(top, bottom);
     }
 
     private Canvas createCanvas(int width, int height) {
