@@ -231,7 +231,8 @@ public class FireworksCanvas extends AbsolutePanel implements HasHandlers, Requi
                 switch (this.analysisInfo.getType()) {
                     case SPECIES_COMPARISON:
                     case OVERREPRESENTATION:
-                        ctx.setStrokeStyle(edge.getColour());
+                        String edgeColour = EnrichmentLegend.COVERAGE ? edge.getCoverageColour() : edge.getEnrichmentColour();
+                        ctx.setStrokeStyle(edgeColour);
                         edge.draw(ctx);
                         break;
                     case EXPRESSION:
@@ -247,24 +248,24 @@ public class FireworksCanvas extends AbsolutePanel implements HasHandlers, Requi
 
         this.drawnNodes = new HashSet<>();
         ctx = this.nodes.getContext2d();
-        String colour = FireworksColours.PROFILE.getNodeInitialColour();
-        ctx.setFillStyle(colour);
-        ctx.setStrokeStyle(colour);
+        String nodeColour = FireworksColours.PROFILE.getNodeInitialColour();
+        ctx.setFillStyle(nodeColour);
+        ctx.setStrokeStyle(nodeColour);
         for (QuadTreeBox item : items) {
             if (item instanceof Node) {
                 Node node = (Node) item;
                 switch (this.analysisInfo.getType()) {
                     case SPECIES_COMPARISON:
                     case OVERREPRESENTATION:
-                        colour = node.getColour();
-                        ctx.setFillStyle(colour);
-                        ctx.setStrokeStyle(colour);
+                        nodeColour = EnrichmentLegend.COVERAGE ? node.getCoverageColour() : node.getEnrichmentColour();
+                        ctx.setFillStyle(nodeColour);
+                        ctx.setStrokeStyle(nodeColour);
                         node.draw(ctx);
                         break;
                     case EXPRESSION:
-                        colour = node.getExpressionColor(column);
-                        ctx.setFillStyle(colour);
-                        ctx.setStrokeStyle(colour);
+                        nodeColour = node.getExpressionColor(column);
+                        ctx.setFillStyle(nodeColour);
+                        ctx.setStrokeStyle(nodeColour);
                         node.draw(ctx);
                         break;
                     case NONE:
