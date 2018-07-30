@@ -336,6 +336,31 @@ public class Node extends FireworkObject implements Drawable, QuadTreeBox, Compa
         }
     }
 
+    /**
+     * Sets both this node's colour and its edge colours to the given colour.
+     * 
+     * @param nodeColour the node colour
+     * @param edgeColour the edge colour
+     */
+    public void setColour(String colour) {
+        setColour(colour, colour);
+    }
+
+    /**
+     * Sets this node's colour and its edge colours.
+     * 
+     * @param nodeColour the node colour
+     * @param edgeColour the edge colour
+     */
+    public void setColour(String nodeColour, String edgeColour) {
+        this.colour = nodeColour;
+        if (edgeColour != null) {
+            for (Edge edge : this.edgesTo) {
+                edge.setColour(edgeColour);
+            }
+        }
+    }
+
     public void setFadeoutColour(){
         this.colour = FireworksColours.PROFILE.getNodeFadeoutColour();
     }
@@ -414,4 +439,5 @@ public class Node extends FireworkObject implements Drawable, QuadTreeBox, Compa
         rtn.add(line.toString().trim());
         return rtn;
     }
+
 }
