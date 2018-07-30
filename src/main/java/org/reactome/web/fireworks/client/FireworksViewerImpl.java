@@ -18,6 +18,7 @@ import org.reactome.web.analysis.client.AnalysisHandler;
 import org.reactome.web.analysis.client.model.AnalysisError;
 import org.reactome.web.analysis.client.model.AnalysisType;
 import org.reactome.web.analysis.client.model.SpeciesFilteredResult;
+import org.reactome.web.fireworks.client.FireworksCanvas.CanvasNotSupportedException;
 import org.reactome.web.fireworks.controls.navigation.ControlAction;
 import org.reactome.web.fireworks.events.*;
 import org.reactome.web.fireworks.handlers.*;
@@ -90,7 +91,7 @@ public class FireworksViewerImpl extends ResizeComposite implements FireworksVie
         try {
             Graph graph = ModelFactory.getGraph(json);
             this.data = new FireworksData(graph);
-            this.canvases = new FireworksCanvas(eventBus, graph); //Graph needed for the thumbnail
+            this.canvases = createCanvas(graph); //Graph needed for the thumbnail
             this.manager = new FireworksViewerManager(eventBus, graph);
             initWidget(canvases);
         } catch (FireworksCanvas.CanvasNotSupportedException e) {
@@ -100,6 +101,11 @@ public class FireworksViewerImpl extends ResizeComposite implements FireworksVie
             initWidget(new Label(e.getMessage()));
             e.printStackTrace();
         }
+    }
+
+    protected FireworksCanvas createCanvas(Graph graph)
+            throws CanvasNotSupportedException {
+        return new FireworksCanvas(eventBus, graph);
     }
 
     @SuppressWarnings("UnusedDeclaration")
@@ -596,9 +602,13 @@ public class FireworksViewerImpl extends ResizeComposite implements FireworksVie
     
     public void setPathwayAnalysisResult(SpeciesFilteredResult result) {
         result.setAnalysisType(AnalysisType.getType(result.getType()));
-        data.setPathwaysAnalysisResult(result); //Data has to be set in the first instance
+        setAnalysisResultData(result); //Data has to be set in the first instance
         eventBus.fireEventFromSource(new AnalysisPerformedEvent(result), this);
         forceFireworksDraw = true;
+    }
+
+    protected void setAnalysisResultData(SpeciesFilteredResult result) {
+        data.setPathwaysAnalysisResult(result);
     }
 
     private void doUpdate(){
