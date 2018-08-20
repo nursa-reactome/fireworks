@@ -347,26 +347,27 @@ public class Node extends FireworkObject implements Drawable, QuadTreeBox, Compa
     }
 
     /**
-     * Sets both this node's colour and its edge colours to the given colour.
+     * Sets both this node's enrichment colour and its edge enrichment
+     * colours to the given colour.
      * 
      * @param nodeColour the node colour
      * @param edgeColour the edge colour
      */
-    public void setColour(String colour) {
-        setColour(colour, colour);
+    public void setEnrichmentColour(String colour) {
+        setEnrichmentColour(colour, colour);
     }
 
     /**
-     * Sets this node's colour and its edge colours.
+     * Sets this node's enrichment colour and its edge enrichment colours.
      * 
      * @param nodeColour the node colour
      * @param edgeColour the edge colour
      */
-    public void setColour(String nodeColour, String edgeColour) {
-        this.colour = nodeColour;
+    public void setEnrichmentColour(String nodeColour, String edgeColour) {
+        this.enrichmentColour = nodeColour;
         if (edgeColour != null) {
             for (Edge edge : this.edgesTo) {
-                edge.setColour(edgeColour);
+                edge.setEnrichmentColour(edgeColour);
             }
         }
     }
