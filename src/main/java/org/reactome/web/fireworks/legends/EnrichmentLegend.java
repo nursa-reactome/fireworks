@@ -57,9 +57,9 @@ public class EnrichmentLegend extends LegendPanel implements AnalysisPerformedHa
     }
 
     protected void addLabels() {
-        InlineLabel top = new InlineLabel("0");
+        top = new InlineLabel("0");
         this.add(top, 20, 5);
-        InlineLabel bottom = new InlineLabel("0.05");
+        bottom = new InlineLabel("0.05");
         this.add(bottom, 12, 230);
         this.gradientLabels = Arrays.asList(top, bottom);
     }
