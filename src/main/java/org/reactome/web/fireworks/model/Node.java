@@ -315,7 +315,8 @@ public class Node extends FireworkObject implements Drawable, QuadTreeBox, Compa
         switch (result.getAnalysisType()){
             case SPECIES_COMPARISON:
             case OVERREPRESENTATION:
-                this.enrichmentColour = FireworksColours.PROFILE.getNodeEnrichmentColour(statistics.getpValue());
+            case DATASET_COMPARISON:
+               this.enrichmentColour = FireworksColours.PROFILE.getNodeEnrichmentColour(statistics.getpValue());
                 String edgeEnrichmentColour = FireworksColours.PROFILE.getEdgeEnrichmentColour(statistics.getpValue());
 
                 double p = statistics.getFound() / (double) statistics.getTotal();

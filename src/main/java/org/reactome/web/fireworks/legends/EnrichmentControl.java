@@ -25,7 +25,11 @@ public class EnrichmentControl extends LegendPanel implements ClickHandler, Chan
     private ListBox selector;
 
     public EnrichmentControl(final EventBus eventBus) {
-        super(eventBus);
+        this(eventBus, true);
+    }
+
+    public EnrichmentControl(final EventBus eventBus, boolean hasCoverage) {
+            super(eventBus);
 
         LegendPanelCSS css = RESOURCES.getCSS();
         //Setting the legend style
@@ -38,12 +42,14 @@ public class EnrichmentControl extends LegendPanel implements ClickHandler, Chan
         this.closeBtn = new ControlButton("Close", css.close(), this);
         this.add(this.closeBtn);
 
-        this.selector = new ListBox();
-        this.selector.addChangeHandler(this);
-        this.selector.addItem("pValue", "false");
-        this.selector.addItem("coverage", "true");
-        this.add(new InlineLabel("Showing"));
-        this.add(this.selector);
+        if (hasCoverage) {
+            this.selector = new ListBox();
+            this.selector.addChangeHandler(this);
+            this.selector.addItem("pValue", "false");
+            this.selector.addItem("coverage", "true");
+            this.add(new InlineLabel("Showing"));
+            this.add(this.selector);
+        }
 
         this.initHandlers();
         this.setVisible(false);
@@ -54,6 +60,7 @@ public class EnrichmentControl extends LegendPanel implements ClickHandler, Chan
         switch (e.getAnalysisType()) {
             case OVERREPRESENTATION:
             case SPECIES_COMPARISON:
+            case DATASET_COMPARISON:
                 String message = e.getAnalysisType().name().replaceAll("_", " ");
                 this.message.setText(message.toUpperCase());
                 this.setVisible(true);

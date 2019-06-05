@@ -88,6 +88,7 @@ public class EnrichmentLegend extends LegendPanel implements AnalysisPerformedHa
         switch (e.getAnalysisType()) {
             case OVERREPRESENTATION:
             case SPECIES_COMPARISON:
+            case DATASET_COMPARISON:
                 setVisible(true);
                 break;
             default:
