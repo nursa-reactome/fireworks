@@ -7,7 +7,7 @@
     <groupId>org.reactome.web</groupId>
     <artifactId>fireworks</artifactId>
     <packaging>jar</packaging>
-    <version>1.7.0</version>
+    <version>1.8.3</version>
     <name>Reactome Fireworks Viewer</name>
 
     <description>
@@ -30,23 +30,23 @@
             <id>ksidis</id>
             <name>Kostas Sidiropoulos</name>
             <email>ksidiro@ebi.ac.uk</email>
-
             <organization>http://www.ebi.ac.uk/</organization>
         </developer>
     </developers>
 
     <properties>
         <!-- Convenience property to set the GWT version -->
-        <gwtVersion>2.8.1</gwtVersion>
+        <gwtVersion>2.8.2</gwtVersion>
         <gwtStyle>OBF</gwtStyle> <!-- OBF | PRETTY | DETAILED -->
 
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <webappDirectory>${project.build.directory}/${project.build.finalName}</webappDirectory>
 
+        <reactome.web.model>2.1.17</reactome.web.model>
         <reactome.web.analysis-client>1.4.0</reactome.web.analysis-client>
-        <reactome.web.model>2.0.0</reactome.web.model>
         <reactome.web.quadtree>1.2.0</reactome.web.quadtree>
+        <reactome.web.scroller>1.0.2</reactome.web.scroller>
 
         <reactome.utils.version>1.0.3</reactome.utils.version>
 
@@ -99,6 +99,12 @@
             <groupId>uk.ac.ebi.pwp.widgets</groupId>
             <artifactId>quadtree</artifactId>
             <version>${reactome.web.quadtree}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.reactome.web</groupId>
+            <artifactId>scroller</artifactId>
+            <version>${reactome.web.scroller}</version>
         </dependency>
 
         <dependency>

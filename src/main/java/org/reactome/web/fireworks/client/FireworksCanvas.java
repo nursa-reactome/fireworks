@@ -25,7 +25,7 @@ import org.reactome.web.fireworks.model.Graph;
 import org.reactome.web.fireworks.model.Node;
 import org.reactome.web.fireworks.profiles.FireworksColours;
 import org.reactome.web.fireworks.util.ToolTipContainer;
-import org.reactome.web.fireworks.util.popups.ImageDownloadDialog;
+import org.reactome.web.fireworks.util.popups.export.ExportDialog;
 import uk.ac.ebi.pwp.structures.quadtree.client.QuadTreeBox;
 
 import java.util.HashSet;
@@ -54,6 +54,8 @@ public class FireworksCanvas extends AbsolutePanel implements HasHandlers, Requi
     private EventBus eventBus;
 
     protected final AnalysisInfo analysisInfo = new AnalysisInfo();
+
+    private Long speciesId;
 
     private Node selected;
     private double fontSize;
@@ -88,6 +90,7 @@ public class FireworksCanvas extends AbsolutePanel implements HasHandlers, Requi
     protected FireworksCanvas(EventBus eventBus, Graph graph) throws CanvasNotSupportedException {
         this.getElement().setClassName("pwp-FireworksCanvas");
         this.eventBus = eventBus;
+        this.speciesId = graph.getSpeciesId();
         this.thumbnail = new FireworksThumbnail(eventBus, graph);
 
         int width = (int) Math.ceil(graph.getMaxX());
@@ -386,7 +389,7 @@ public class FireworksCanvas extends AbsolutePanel implements HasHandlers, Requi
         this.cleanCanvas(this.textTLP);
     }
 
-    public void exportImage(final String diagramStId) {
+    public void showExportDialog(final Node selected, final String flagTerm, final Boolean includeInteractors, final String analysisToken, final String resource) {
         final Context2d ctx = this.canvases.get(this.canvases.size() - 1).getContext2d();
         //This is silly but gives some visual feedback of the picture taking :D
         (new Timer() {
@@ -407,10 +410,20 @@ public class FireworksCanvas extends AbsolutePanel implements HasHandlers, Requi
                     for (int i = 0; i < canvases.size() - 1; i++) {
                         ctx.drawImage(canvases.get(i).getCanvasElement(), 0, 0);
                     }
-                    Image image = new Image();
-                    image.setUrl(ctx.getCanvas().toDataUrl("image/png"));
-                    final ImageDownloadDialog downloadDialogBox = new ImageDownloadDialog(image, diagramStId);
-                    downloadDialogBox.show();
+                    Image snapshot = new Image();
+                    snapshot.setUrl(ctx.getCanvas().toDataUrl("image/png"));
+                    final ExportDialog dialog = new ExportDialog(
+                            speciesId,
+                            selected != null ? selected.getStId() : null,
+                            selected != null ? selected.getDbId() : null,
+                            flagTerm,
+                            includeInteractors,
+                            analysisToken,
+                            resource,
+                            EnrichmentLegend.COVERAGE,
+                            snapshot
+                    );
+                    dialog.showCentered();
                     cleanCanvas(ctx);
                 }
             }
@@ -454,8 +467,6 @@ public class FireworksCanvas extends AbsolutePanel implements HasHandlers, Requi
 
     private void flagEdge(Edge edge) {
         Context2d ctx = this.nodesFlagged.getContext2d();
-
-
     }
 
     public void highlightNode(Node node) {

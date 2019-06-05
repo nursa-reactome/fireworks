@@ -59,6 +59,7 @@ public class WidgetTest implements EntryPoint {
             public void onSuccess() {
                 FireworksFactory.CONSOLE_VERBOSE = true;
                 FireworksFactory.EVENT_BUS_VERBOSE = true;
+                FireworksFactory.SERVER = "https://dev.reactome.org";
 //                FireworksFactory.SHOW_INFO = true;
 
                 loadSpeciesFireworks("Homo_sapiens");
@@ -101,7 +102,7 @@ public class WidgetTest implements EntryPoint {
         fp.add(new Button("OVERREPRESENTATION 2", new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-                fireworks.setAnalysisToken("MjAxODA0MTgxMDQ0MTNfNjk1Mw%253D%253D", "TOTAL");
+                fireworks.setAnalysisToken("MjAxODA3MDIwNTQ2MzVfMw%253D%253D", "TOTAL");
             }
         }));
         fp.add(new Button("EXPRESSION", new ClickHandler() {

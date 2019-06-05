@@ -25,6 +25,8 @@ public interface FireworksViewer extends IsWidget, HasHandlers, RequiresResize {
 
     HandlerRegistration addNodeHoverResetHandler(NodeHoverResetHandler handler);
 
+    HandlerRegistration addNodeFlaggedHandler(NodeFlaggedHandler handler);
+
     HandlerRegistration addNodeFlaggedResetHandler(NodeFlaggedResetHandler handler);
 
     HandlerRegistration addNodeOpenedHandler(NodeOpenedHandler handler);
@@ -37,7 +39,7 @@ public interface FireworksViewer extends IsWidget, HasHandlers, RequiresResize {
 
     Node getSelected();
 
-    void flagItems(String identifier);
+    void flagItems(String identifier, Boolean includeInteractors);
 
     void flagNodes(String term, String... stIds);
 
