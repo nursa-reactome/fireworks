@@ -53,7 +53,7 @@ public class FireworksCanvas extends AbsolutePanel implements HasHandlers, Requi
 
     private EventBus eventBus;
 
-    private final AnalysisInfo analysisInfo = new AnalysisInfo();
+    protected final AnalysisInfo analysisInfo = new AnalysisInfo();
 
     private Node selected;
     private double fontSize;
@@ -133,7 +133,7 @@ public class FireworksCanvas extends AbsolutePanel implements HasHandlers, Requi
 
         //Enrichment legend and control panels
         rightContainerPanel.add(createLegendPanel(eventBus));
-        bottomContainerPanel.add(new EnrichmentControl(eventBus));
+        bottomContainerPanel.add(createEnrichmentControl(eventBus));
 
         //Expression legend and control panels
         rightContainerPanel.add(new ExpressionLegend(eventBus));
@@ -151,6 +151,10 @@ public class FireworksCanvas extends AbsolutePanel implements HasHandlers, Requi
         this.add(this.illustration = new IllustrationPanel(), 0, 0);
 
         this.initialiseHandlers();
+    }
+
+    protected EnrichmentControl createEnrichmentControl(EventBus eventBus) {
+        return new EnrichmentControl(eventBus);
     }
 
     protected Panel createHideablePanel(EventBus eventBus) {
@@ -228,21 +232,7 @@ public class FireworksCanvas extends AbsolutePanel implements HasHandlers, Requi
         for (QuadTreeBox item : items) {
             if (item instanceof Edge) {
                 Edge edge = (Edge) item;
-                switch (this.analysisInfo.getType()) {
-                    case SPECIES_COMPARISON:
-                    case OVERREPRESENTATION:
-                        String edgeColour = EnrichmentLegend.COVERAGE ? edge.getCoverageColour() : edge.getEnrichmentColour();
-                        ctx.setStrokeStyle(edgeColour);
-                        edge.draw(ctx);
-                        break;
-                    case EXPRESSION:
-                        ctx.setStrokeStyle(edge.getExpressionColor(column));
-                        edge.draw(ctx);
-                        break;
-                    case NONE:
-                    default:
-                        edge.draw(ctx);
-                }
+                drawEdge(column, ctx, edge);
             }
         }
 
@@ -254,30 +244,53 @@ public class FireworksCanvas extends AbsolutePanel implements HasHandlers, Requi
         for (QuadTreeBox item : items) {
             if (item instanceof Node) {
                 Node node = (Node) item;
-                switch (this.analysisInfo.getType()) {
-                    case SPECIES_COMPARISON:
-                    case OVERREPRESENTATION:
-                        nodeColour = EnrichmentLegend.COVERAGE ? node.getCoverageColour() : node.getEnrichmentColour();
-                        ctx.setFillStyle(nodeColour);
-                        ctx.setStrokeStyle(nodeColour);
-                        node.draw(ctx);
-                        break;
-                    case EXPRESSION:
-                        nodeColour = node.getExpressionColor(column);
-                        ctx.setFillStyle(nodeColour);
-                        ctx.setStrokeStyle(nodeColour);
-                        node.draw(ctx);
-                        break;
-                    case NONE:
-                    default:
-                        node.draw(ctx);
-                }
+                drawNode(column, ctx, node);
                 this.drawnNodes.add((node));
             }
         }
 
         if (this.info != null) {
             this.info.setNodes(this.drawnNodes.size());
+        }
+    }
+
+    protected void drawNode(int column, Context2d ctx, Node node) {
+        String nodeColour;
+        switch (this.analysisInfo.getType()) {
+            case SPECIES_COMPARISON:
+            case OVERREPRESENTATION:
+                nodeColour = EnrichmentLegend.COVERAGE ? node.getCoverageColour() : node.getEnrichmentColour();
+                ctx.setFillStyle(nodeColour);
+                ctx.setStrokeStyle(nodeColour);
+                node.draw(ctx);
+                break;
+            case EXPRESSION:
+                nodeColour = node.getExpressionColor(column);
+                ctx.setFillStyle(nodeColour);
+                ctx.setStrokeStyle(nodeColour);
+                node.draw(ctx);
+                break;
+            case NONE:
+            default:
+                node.draw(ctx);
+        }
+    }
+
+    protected void drawEdge(int column, Context2d ctx, Edge edge) {
+        switch (this.analysisInfo.getType()) {
+            case SPECIES_COMPARISON:
+            case OVERREPRESENTATION:
+                String edgeColour = EnrichmentLegend.COVERAGE ? edge.getCoverageColour() : edge.getEnrichmentColour();
+                ctx.setStrokeStyle(edgeColour);
+                edge.draw(ctx);
+                break;
+            case EXPRESSION:
+                ctx.setStrokeStyle(edge.getExpressionColor(column));
+                edge.draw(ctx);
+                break;
+            case NONE:
+            default:
+                edge.draw(ctx);
         }
     }
 
