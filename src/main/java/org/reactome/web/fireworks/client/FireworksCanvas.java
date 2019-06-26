@@ -142,6 +142,9 @@ public class FireworksCanvas extends AbsolutePanel implements HasHandlers, Requi
         rightContainerPanel.add(new ExpressionLegend(eventBus));
         bottomContainerPanel.add(new ExpressionControl(eventBus));
 
+        //Regulation legend
+        rightContainerPanel.add(new RegulationLegend(eventBus));
+
         //Launcher panels
         this.add(new LeftTopLauncherPanel(eventBus, graph));
         this.add(new RightTopLauncherPanel(eventBus));
@@ -260,40 +263,46 @@ public class FireworksCanvas extends AbsolutePanel implements HasHandlers, Requi
     protected void drawNode(int column, Context2d ctx, Node node) {
         String nodeColour;
         switch (this.analysisInfo.getType()) {
-            case SPECIES_COMPARISON:
-            case OVERREPRESENTATION:
-                nodeColour = EnrichmentLegend.COVERAGE ? node.getCoverageColour() : node.getEnrichmentColour();
-                ctx.setFillStyle(nodeColour);
-                ctx.setStrokeStyle(nodeColour);
-                node.draw(ctx);
-                break;
-            case EXPRESSION:
-                nodeColour = node.getExpressionColor(column);
-                ctx.setFillStyle(nodeColour);
-                ctx.setStrokeStyle(nodeColour);
-                node.draw(ctx);
-                break;
-            case NONE:
-            default:
-                node.draw(ctx);
+        case SPECIES_COMPARISON:
+        case OVERREPRESENTATION:
+            nodeColour = EnrichmentLegend.COVERAGE ? node.getCoverageColour() : node.getEnrichmentColour();
+            ctx.setFillStyle(nodeColour);
+            ctx.setStrokeStyle(nodeColour);
+            node.draw(ctx);
+            break;
+        case EXPRESSION:
+        case GSA_STATISTICS:
+        case GSVA:
+        case GSA_REGULATION:
+            nodeColour = node.getExpressionColor(column);
+            ctx.setFillStyle(nodeColour);
+            ctx.setStrokeStyle(nodeColour);
+            node.draw(ctx);
+            break;
+        case NONE:
+        default:
+            node.draw(ctx);
         }
     }
 
     protected void drawEdge(int column, Context2d ctx, Edge edge) {
         switch (this.analysisInfo.getType()) {
-            case SPECIES_COMPARISON:
-            case OVERREPRESENTATION:
-                String edgeColour = EnrichmentLegend.COVERAGE ? edge.getCoverageColour() : edge.getEnrichmentColour();
-                ctx.setStrokeStyle(edgeColour);
-                edge.draw(ctx);
-                break;
-            case EXPRESSION:
-                ctx.setStrokeStyle(edge.getExpressionColor(column));
-                edge.draw(ctx);
-                break;
-            case NONE:
-            default:
-                edge.draw(ctx);
+        case SPECIES_COMPARISON:
+        case OVERREPRESENTATION:
+            String edgeColour = EnrichmentLegend.COVERAGE ? edge.getCoverageColour() : edge.getEnrichmentColour();
+            ctx.setStrokeStyle(edgeColour);
+            edge.draw(ctx);
+            break;
+        case EXPRESSION:
+        case GSA_STATISTICS:
+        case GSVA:
+        case GSA_REGULATION:
+            ctx.setStrokeStyle(edge.getExpressionColor(column));
+            edge.draw(ctx);
+            break;
+        case NONE:
+        default:
+            edge.draw(ctx);
         }
     }
 

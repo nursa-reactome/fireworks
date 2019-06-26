@@ -15,6 +15,7 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 import org.reactome.web.analysis.client.AnalysisClient;
 import org.reactome.web.analysis.client.AnalysisHandler;
+import org.reactome.web.analysis.client.filter.ResultFilter;
 import org.reactome.web.analysis.client.model.AnalysisError;
 import org.reactome.web.analysis.client.model.AnalysisType;
 import org.reactome.web.analysis.client.model.SpeciesFilteredResult;
@@ -27,6 +28,7 @@ import org.reactome.web.fireworks.model.FireworksData;
 import org.reactome.web.fireworks.model.Graph;
 import org.reactome.web.fireworks.model.Node;
 import org.reactome.web.fireworks.model.factory.ModelFactory;
+import org.reactome.web.fireworks.profiles.FireworksColours;
 import org.reactome.web.fireworks.search.events.SuggestionHoveredEvent;
 import org.reactome.web.fireworks.search.events.SuggestionSelectedEvent;
 import org.reactome.web.fireworks.search.handlers.SuggestionHoveredHandler;
@@ -66,7 +68,7 @@ public class FireworksViewerImpl extends ResizeComposite implements FireworksVie
 
     private String token;
 
-    private String resource;
+    private ResultFilter filter = new ResultFilter();
 
     protected boolean forceFireworksDraw = true;
 
@@ -84,7 +86,7 @@ public class FireworksViewerImpl extends ResizeComposite implements FireworksVie
     private Set<Node> nodesToFlag = null;
     private Set<Edge> edgesToFlag = null;
     private String flagTerm;
-    private Boolean includeInteractors = true;
+    private Boolean includeInteractors = false;
 
     FireworksViewerImpl(String json) {
         this.eventBus = new FireworksEventBus();
@@ -248,7 +250,8 @@ public class FireworksViewerImpl extends ResizeComposite implements FireworksVie
 
     @Override
     public void onAnalysisReset() {
-        this.token = this.resource = null;
+        this.token = null;
+        this.filter = null;
         this.data.resetPathwaysAnalysisResult();
         this.forceFireworksDraw = true;
     }
@@ -262,14 +265,15 @@ public class FireworksViewerImpl extends ResizeComposite implements FireworksVie
     @Override
     public void onControlAction(ControlActionEvent event) {
         switch (event.getAction()){
-            case FIT_ALL:   this.manager.displayAllNodes(true); break;
-            case ZOOM_IN:   this.manager.zoom(0.25);            break;
-            case ZOOM_OUT:  this.manager.zoom(-0.25);           break;
-            case UP:        this.manager.translate(0, 10);      break;
-            case RIGHT:     this.manager.translate(-10, 0);     break;
-            case DOWN:      this.manager.translate(0, -10);     break;
-            case LEFT:      this.manager.translate(10, 0);      break;
-            case OPEN:      this.openNode(this.selected);       break;
+            case FIT_ALL:   this.manager.displayAllNodes(true);  break;
+            case ZOOM_IN:   this.manager.zoom(0.25);                break;
+            case ZOOM_OUT:  this.manager.zoom(-0.25);               break;
+            case UP:        this.manager.translate(0, 10);        break;
+            case RIGHT:     this.manager.translate(-10, 0);       break;
+            case DOWN:      this.manager.translate(0, -10);       break;
+            case LEFT:      this.manager.translate(10, 0);        break;
+            case OPEN:      this.openNode(this.selected);                  break;
+            case FOAM:      this.openFoamTree(this.selected);              break;
         }
     }
 
@@ -297,7 +301,7 @@ public class FireworksViewerImpl extends ResizeComposite implements FireworksVie
 
     @Override
     public void onCanvasExportRequested(CanvasExportRequestedEvent event) {
-        this.canvases.showExportDialog(selected, flagTerm, includeInteractors, token, resource);
+        this.canvases.showExportDialog(selected, flagTerm, includeInteractors, token, filter.getResource());
     }
 
     @Override
@@ -585,21 +589,24 @@ public class FireworksViewerImpl extends ResizeComposite implements FireworksVie
     }
 
     @Override
-    public void setAnalysisToken(String token, final String resource){
-        if(token==null || resource==null) return;
-        if(Objects.equals(this.token, token) && Objects.equals(this.resource, resource)) return;
-        this.token = token; this.resource = resource;
+    public void setAnalysisToken(String token, final ResultFilter filter){
+        if (token == null || filter == null) return;
+        if (Objects.equals(this.token, token) && Objects.equals(this.filter, filter)) return;
+        this.token = token; this.filter = filter;
 
         this.canvases.onAnalysisReset();
         this.data.resetPathwaysAnalysisResult();
-        filterResultBySpecies(token, resource);
+        filterResultBySpecies(token, filter.getResource());
     }
 
     protected void filterResultBySpecies(String token, final String resource) {
-        AnalysisClient.filterResultBySpecies(token, resource, this.data.getSpeciesId(), new AnalysisHandler.Pathways() {
+         AnalysisClient.filterResultBySpecies(token, filter.getResource(), this.data.getSpeciesId(), new AnalysisHandler.Pathways() {
             @Override
             public void onPathwaysSpeciesFiltered(SpeciesFilteredResult result) {
-                setPathwayAnalysisResult(result);
+                result.setAnalysisType(AnalysisType.getType(result.getType()));
+                data.setPathwaysAnalysisResult(result, filter); //Data has to be set in the first instance
+                eventBus.fireEventFromSource(new AnalysisPerformedEvent(result, filter), FireworksViewerImpl.this);
+                forceFireworksDraw = true;
             }
 
             @Override
@@ -627,7 +634,7 @@ public class FireworksViewerImpl extends ResizeComposite implements FireworksVie
 
     @Override
     public void resetAnalysis() {
-        this.token = null; this.resource=null;
+        this.token = null; this.filter=null;
         eventBus.fireEventFromSource(new AnalysisResetEvent(), this);
     }
 
@@ -637,16 +644,16 @@ public class FireworksViewerImpl extends ResizeComposite implements FireworksVie
 
     }
     
-    public void setPathwayAnalysisResult(SpeciesFilteredResult result) {
-        result.setAnalysisType(AnalysisType.getType(result.getType()));
-        setAnalysisResultData(result); //Data has to be set in the first instance
-        eventBus.fireEventFromSource(new AnalysisPerformedEvent(result), this);
-        forceFireworksDraw = true;
-    }
-
-    protected void setAnalysisResultData(SpeciesFilteredResult result) {
-        data.setPathwaysAnalysisResult(result);
-    }
+//    public void setPathwayAnalysisResult(SpeciesFilteredResult result) {
+//        result.setAnalysisType(AnalysisType.getType(result.getType()));
+//        setAnalysisResultData(result); //Data has to be set in the first instance
+//        eventBus.fireEventFromSource(new AnalysisPerformedEvent(result), this);
+//        forceFireworksDraw = true;
+//    }
+//
+//    protected void setAnalysisResultData(SpeciesFilteredResult result) {
+//        data.setPathwaysAnalysisResult(result);
+//    }
 
     private void doUpdate(){
         this.doUpdate(false);
@@ -759,6 +766,30 @@ public class FireworksViewerImpl extends ResizeComposite implements FireworksVie
         if(node!=null){
             this.manager.expandNode(node);
         }
+    }
+
+    private void openFoamTree(Node node) {
+        StringBuilder url = new StringBuilder("/reacfoam");
+        url.append("?species=").append(data.getSpeciesId());
+        url.append("&color=").append(FireworksColours.PROFILE.getName().toUpperCase());
+        if (token != null && !token.isEmpty()) {
+            url.append("&analysis=").append(token);
+        }
+
+        if (filter != null) {
+            url.append("&").append(filter);
+        }
+
+        if (node != null) {
+            url.append("&sel=").append(node.getStId());
+        }
+
+        if (flagTerm != null && !flagTerm.isEmpty()) {
+            url.append("&flg=").append(flagTerm);
+        }
+
+        Window.open(url.toString(), "_blank", "");
+
     }
 
     private void setMouseDownPosition(Element element, MouseEvent event){

@@ -1,5 +1,6 @@
 package org.reactome.web.fireworks.model;
 
+import org.reactome.web.analysis.client.filter.ResultFilter;
 import org.reactome.web.analysis.client.model.PathwayBase;
 import org.reactome.web.analysis.client.model.SpeciesFilteredResult;
 
@@ -17,6 +18,7 @@ public class FireworksData {
     private Map<String, Node> stId2Node;
 
     private SpeciesFilteredResult analysisResult;
+    private ResultFilter analysisFilter;
 
     public FireworksData(Graph graph) {
         this.graph = graph;
@@ -48,13 +50,15 @@ public class FireworksData {
 
     public void resetPathwaysAnalysisResult(){
         this.analysisResult = null;
+        this.analysisFilter = null;
         for (Node node : this.graph.getNodes()) {
             node.initStatistics();
         }
     }
 
-    public void setPathwaysAnalysisResult(SpeciesFilteredResult result) {
+    public void setPathwaysAnalysisResult(SpeciesFilteredResult result, ResultFilter filter) {
         this.analysisResult = result;
+        this.analysisFilter = filter;
 
         for (Node node : this.graph.getNodes()) {
             node.setFadeoutColour();
@@ -68,7 +72,7 @@ public class FireworksData {
                 node = stId2Node.get(pathway.getStId());
             }
             if(node!=null){
-                node.setAnalysisResultData(result, pathway.getEntities());
+                node.setAnalysisResultData(result, pathway.getEntities(), filter);
             }
         }
     }
@@ -104,8 +108,8 @@ public class FireworksData {
     }
 
     public void updateColours(){
-        if(this.analysisResult!=null){
-            setPathwaysAnalysisResult(this.analysisResult);
+        if(this.analysisResult!=null && this.analysisFilter!=null){
+            setPathwaysAnalysisResult(this.analysisResult, this.analysisFilter);
         }
     }
 }
