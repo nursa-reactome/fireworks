@@ -88,7 +88,7 @@ public class FireworksViewerImpl extends ResizeComposite implements FireworksVie
     private String flagTerm;
     private Boolean includeInteractors = false;
 
-    FireworksViewerImpl(String json) {
+    public FireworksViewerImpl(String json) {
         this.eventBus = new FireworksEventBus();
         try {
             Graph graph = ModelFactory.getGraph(json);
@@ -604,7 +604,7 @@ public class FireworksViewerImpl extends ResizeComposite implements FireworksVie
             @Override
             public void onPathwaysSpeciesFiltered(SpeciesFilteredResult result) {
                 result.setAnalysisType(AnalysisType.getType(result.getType()));
-                data.setPathwaysAnalysisResult(result, filter); //Data has to be set in the first instance
+                setAnalysisResultData(result); //Data has to be set in the first instance
                 eventBus.fireEventFromSource(new AnalysisPerformedEvent(result, filter), FireworksViewerImpl.this);
                 forceFireworksDraw = true;
             }
@@ -644,16 +644,12 @@ public class FireworksViewerImpl extends ResizeComposite implements FireworksVie
 
     }
     
-//    public void setPathwayAnalysisResult(SpeciesFilteredResult result) {
-//        result.setAnalysisType(AnalysisType.getType(result.getType()));
-//        setAnalysisResultData(result); //Data has to be set in the first instance
-//        eventBus.fireEventFromSource(new AnalysisPerformedEvent(result), this);
-//        forceFireworksDraw = true;
-//    }
-//
-//    protected void setAnalysisResultData(SpeciesFilteredResult result) {
-//        data.setPathwaysAnalysisResult(result);
-//    }
+    public void setPathwayAnalysisResult(SpeciesFilteredResult result) {
+        result.setAnalysisType(AnalysisType.getType(result.getType()));
+        setAnalysisResultData(result); //Data has to be set in the first instance
+        eventBus.fireEventFromSource(new AnalysisPerformedEvent(result, filter), this);
+        forceFireworksDraw = true;
+    }
 
     private void doUpdate(){
         this.doUpdate(false);
@@ -859,5 +855,9 @@ public class FireworksViewerImpl extends ResizeComposite implements FireworksVie
             this.eventBus.fireEventFromSource(new NodeFlaggedEvent(term, includeInteractors, this.nodesToFlag), this);
         }
         forceFireworksDraw = true;
+    }
+
+    protected void setAnalysisResultData(SpeciesFilteredResult result) {
+        data.setPathwaysAnalysisResult(result, filter);
     }
 }
