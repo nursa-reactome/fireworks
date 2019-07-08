@@ -13,7 +13,6 @@ public abstract class SearchResultImageMapper {
     private final static DatabaseObjectImages INSTANCE = DatabaseObjectImages.INSTANCE;
     private final static ImageContainer reaction = new ImageContainer(INSTANCE.reaction(), "Reaction");
     private final static ImageContainer genomeEncodeEntity = new ImageContainer(INSTANCE.genomeEncodeEntity(), "Genome Encoded Entity");
-    private final static ImageContainer protein = new ImageContainer(INSTANCE.entityWithAccessionedSequence(), "Protein");
     private final static ImageContainer complex = new ImageContainer(INSTANCE.complex(), "Complex");
     private final static ImageContainer set = new ImageContainer(INSTANCE.entitySet(), "Set");
     private final static ImageContainer interactor = new ImageContainer(SolrSuggestionPanel.RESOURCES.interactor(), "Interactor");
@@ -56,9 +55,6 @@ public abstract class SearchResultImageMapper {
                     return reaction;
                 case "genomeencodedentity":
                     return genomeEncodeEntity;
-                case "protein":
-                case "referencegeneproduct":
-                    return protein;
                 case "complex":
                     return complex;
                 case "set":
