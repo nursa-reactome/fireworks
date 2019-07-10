@@ -228,7 +228,7 @@ class FireworksThumbnail extends AbsolutePanel implements HasHandlers, MouseDown
             switch (this.analysisInfo.getType()) {
                 case SPECIES_COMPARISON:
                 case OVERREPRESENTATION:
-                    edgeColour = EnrichmentLegend.COVERAGE ? edge.getCoverageColour() : edge.getEnrichmentColour();
+                    edgeColour = edge.getEnrichmentColour();
                     ctx.setStrokeStyle(edgeColour);
                     edge.drawThumbnail(ctx, this.factor);
                     break;
