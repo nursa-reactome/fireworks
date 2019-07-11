@@ -66,6 +66,16 @@ public class Edge implements Drawable, QuadTreeBox {
     }
 
     /**
+     * Legacy Nursa portal work-around.
+     * 
+     * @return the color associated with this node for normal visualisation, overrepresentation
+     *         analysis or species comparison.
+     */
+    public String getColour() {
+        return getEnrichmentColour();
+    }
+
+    /**
      * Can be used either for normal visualisation, overrepresentation analysis or species comparison.
      *
      * @return the color associated with this node for normal visualisation, overrepresentation
@@ -126,6 +136,15 @@ public class Edge implements Drawable, QuadTreeBox {
         double x = (aux * aux) * from.getX() + 2 * aux * pct * control.getX() + (pct * pct) * to.getX();
         double y = (aux * aux) * from.getY() + 2 * aux * pct * control.getY() + (pct * pct) * to.getY();
         return new Coordinate(x, y);
+    }
+
+    /**
+     * Legacy Nursa portal work-around code.
+     * 
+     * @param colour the edge colour
+     */
+    public void setColour(String colour) {
+        setEnrichmentColour(colour);
     }
 
     public void setEnrichmentColour(String enrichmentColour) {

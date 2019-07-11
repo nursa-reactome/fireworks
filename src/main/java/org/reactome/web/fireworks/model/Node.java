@@ -188,6 +188,16 @@ public class Node extends FireworkObject implements Drawable, QuadTreeBox, Compa
     }
 
     /**
+     * Legacy Nursa portal work-around.
+     * 
+     * @return the color associated with this node for normal visualisation, overrepresentation
+     *         analysis or species comparison.
+     */
+    public String getColour() {
+        return getEnrichmentColour();
+    }
+
+    /**
      * Can be used either for normal visualisation, overrepresentation analysis or species comparison.
      *
      * @return the color associated with this node for normal visualisation, overrepresentation
@@ -346,23 +356,41 @@ public class Node extends FireworkObject implements Drawable, QuadTreeBox, Compa
     }
 
     /**
+     * Legacy Nursa portal work-around code.
+     * 
+     * @param colour the node colour
+     */
+    public void setColour(String colour) {
+        setColour(colour, colour);
+    }
+
+    /**
      * Sets both this node's enrichment colour and its edge enrichment
      * colours to the given colour.
      * 
-     * @param nodeColour the node colour
-     * @param edgeColour the edge colour
+     * @param colour the node colour
      */
     public void setEnrichmentColour(String colour) {
         setEnrichmentColour(colour, colour);
     }
 
     /**
-     * Sets this node's enrichment colour and its edge enrichment colours.
+     * Legacy Nursa portal work-around code.
      * 
      * @param nodeColour the node colour
      * @param edgeColour the edge colour
      */
-    public void setEnrichmentColour(String nodeColour, String edgeColour) {
+    public void setColour(String nodeColour, String edgeColour) {
+        setEnrichmentColour(nodeColour, edgeColour);
+    }
+
+        /**
+         * Sets this node's enrichment colour and its edge enrichment colours.
+         * 
+         * @param nodeColour the node colour
+         * @param edgeColour the edge colour
+         */
+        public void setEnrichmentColour(String nodeColour, String edgeColour) {
         this.enrichmentColour = nodeColour;
         if (edgeColour != null) {
             for (Edge edge : this.edgesTo) {
